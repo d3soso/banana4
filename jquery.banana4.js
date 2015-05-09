@@ -1,7 +1,7 @@
 
 /* --------------------------------------------------------
 
-	jQuery:Banner4 Ver.0.9.0 (β)
+	jQuery::Banana4 Ver.0.9.0 (β)
 
 	(C)usosake.net / d3soso
 	http://usosake.net/banana4/
