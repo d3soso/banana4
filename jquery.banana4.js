@@ -1,10 +1,15 @@
 
-/* -------------------------------------------------
+/* --------------------------------------------------------
 
 	jQuery:Banner4 Ver.0.9.0 (β)
-	http://usosake.net/
 
-------------------------------------------------- */
+	(C)usosake.net / d3soso
+	http://usosake.net/banana4/
+
+	Released under the MIT license
+	https://github.com/d3soso/banana4/blob/master/LICENSE
+
+--------------------------------------------------------- */
 
 (function($) {
 	$.fn.banana4 = function(args) {
