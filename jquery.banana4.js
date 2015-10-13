@@ -1,7 +1,7 @@
 
 /* --------------------------------------------------------
 
-	jQuery::Banana4 Ver.0.9.0 (β)
+	jQuery::Banana4 Ver.0.9.001 (β)
 
 	(C)usosake.net / d3soso
 	http://usosake.net/banana4/
@@ -358,7 +358,7 @@
 			var i = 0;
 			if(d=="next") {
 				for(i=init; i<=last; i++) {
-					left = ($(obj).find("ul li:last").css("left").slice(0, -2) - 0);
+					left = ($(obj).find("ul li:last").css("left").slice(0, -2) - 0) + $(obj).find("ul li:last").width();
 					$(obj).find("ul").append('<li class="banana4_li_' + _serial + '">' + _list[getCount(i)] + '</li>');
 					setListCSS(obj, left);
 					dragevent(obj, $(obj).find('.banana4_li_' + _serial));
@@ -472,7 +472,7 @@
 			if(_args.delay != 0) {
 				if(!_args.delay) _args.delay = 5000;
 			}
-			if(!_args.auto) _args.auto = false;
+			if(_args.auto != false) _args.auto = true;
 		}
 
 		function initList(obj) {
