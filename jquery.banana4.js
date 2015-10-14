@@ -91,6 +91,12 @@
 
 		--------------------- */
 
+		/*
+		外部からの操作に対応(暫定版)
+		セレクタで指定したHTML Objectがこの関数から参照できない？ので
+		対象となるHTML Objectを引数(r)によって指定している
+		*/
+
 		$.fn.banana4.next = function(r) {
 			var obj = r;
 			animation(obj, setCurrent(obj, _current["current"] + 1));
