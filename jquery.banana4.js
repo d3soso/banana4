@@ -14,6 +14,7 @@
 (function($) {
 	$.fn.banana4 = function(args) {
 
+		var _obj = {};
 		var _list = [];
 		var _args = args;
 		var _debug = false;
@@ -34,7 +35,6 @@
 
 		var _timer;
 
-		return this.each(INIT);
 
 		function INIT() {
 			if(checkQuery(this)) {
@@ -46,6 +46,7 @@
 				$(window).resize(function() { RESIZE(t); });
 				drag(this);
 				animation(this, "next");
+				_obj[$(this).prop("id")] = this;
 			}
 		}
 
@@ -82,6 +83,27 @@
 				var len = $(obj).find("ul li").length - 1;
 				return -1 *(len - i) * s.inner_w + s.inner_w * 2 + s.left;
 			}
+		}
+
+		/* --------------------
+
+		    Public Methods
+
+		--------------------- */
+
+		$.fn.banana4.next = function(r) {
+			var obj = r;
+			animation(obj, setCurrent(obj, _current["current"] + 1));
+		}
+
+		$.fn.banana4.prev = function(r) {
+			var obj = r;
+			animation(obj, setCurrent(obj, _current["current"] - 1));
+		}
+
+		$.fn.banana4.jump = function(r, c) {
+			var obj = r;
+			animation(obj, setCurrent(obj, c));
 		}
 
 
@@ -494,5 +516,8 @@
 				next : getCount(2)
 			};
 		}
+
+		return this.each(INIT);
+
 	}
 })(jQuery);
