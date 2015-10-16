@@ -1,7 +1,7 @@
 
 /* --------------------------------------------------------
 
-	jQuery::Banana4 Ver.0.9.001 (β)
+	jQuery::Banana4 Ver.0.9.100 (β)
 
 	(C)usosake.net / d3soso
 	http://usosake.net/banana4/
@@ -11,8 +11,11 @@
 
 --------------------------------------------------------- */
 
-(function($) {
+;(function($) {
 	$.fn.banana4 = function(args) {
+
+		var _obj = {};
+		var _obj_count = 0;
 
 		var _list = [];
 		var _args = args;
@@ -34,7 +37,6 @@
 
 		var _timer;
 
-		return this.each(INIT);
 
 		function INIT() {
 			if(checkQuery(this)) {
@@ -46,6 +48,12 @@
 				$(window).resize(function() { RESIZE(t); });
 				drag(this);
 				animation(this, "next");
+
+				_obj[_obj_count] = {
+					id : $(this).prop("id")
+				};
+				_obj_count++;
+
 			}
 		}
 
@@ -82,6 +90,34 @@
 				var len = $(obj).find("ul li").length - 1;
 				return -1 *(len - i) * s.inner_w + s.inner_w * 2 + s.left;
 			}
+		}
+
+		/* --------------------
+
+		    Public Methods
+
+		--------------------- */
+
+		$.banana4 = {};
+
+		$.banana4.prev = function(r) {
+			var obj = r;
+			animation(obj, setCurrent(obj, _current["current"] - 1));
+		}
+
+		$.banana4.next = function(r) {
+			var obj = r;
+			animation(obj, setCurrent(obj, _current["current"] + 1));
+		}
+
+		$.banana4.jump = function(r, c) {
+			var obj = r;
+			animation(obj, setCurrent(obj, c));
+		}
+
+		$.banana4.remove = function(r) {
+			var obj = r;
+			removeDragevent(r);
 		}
 
 
@@ -153,6 +189,7 @@
 		}
 
 		function cssNavi(obj) {
+
 			var s = getSize(obj);
 			$(obj).find(".banana4_navi").css({
 				display : "block",
@@ -190,9 +227,13 @@
 		--------------------- */
 
 		function drag(obj) {
+			/*
 			$(obj).find("ul li").each(function(i) {
 				dragevent(obj, this);
 			});
+			*/
+			//dragevent(obj, $(obj));
+			dragevent(obj, $(obj));
 		}
 
 		function dragevent(obj, li) {
@@ -204,6 +245,12 @@
 				//'mouseup'    : function() { dragend(obj); },
 				'touchend'   : function() { dragend(obj); }
 			})
+		}
+
+		function removeDragevent(li) {
+			$(li).off('touchstart');
+			$(li).off('touchmove');
+			$(li).off('touchend');
 		}
 
 		function dragstart(obj, e, type) {
@@ -228,7 +275,7 @@
 
 				$(obj).find("ul li").each(function(i) {
 					$(this).css("left", _drag_x_offset[i] + (_drag_x_move - _drag_x_init) + "px");
-					console.log("move" + i + " : " + _drag_x_offset[i] + (_drag_x_move - _drag_x_init));
+					//console.log("move" + i + " : " + _drag_x_offset[i] + (_drag_x_move - _drag_x_init));
 				})
 
 			}
@@ -332,12 +379,13 @@
 		}
 
 		function removeList(obj, t) {
+			var buffer = 1.1;
 			var s = getSize(obj);
-			var left = $(t).css("left").slice(0, -2);
-			if(left < -1 * s.inner_w * 2 + s.left) {
+			var left = $(t).css("left").slice(0, -2) - 0;
+			if(left < -1 * s.inner_w * 2 * buffer + s.left) {
 				$(t).remove();
 				_current["prev"] = getCount(_current["prev"]+1);
-			}else if(left > s.inner_w * 2 + s.left) {
+			}else if(left > s.inner_w * 2 * buffer + s.left) {
 				$(t).remove();
 				_current["next"] = getCount(_current["next"]-1)
 			}
@@ -361,7 +409,7 @@
 					left = ($(obj).find("ul li:last").css("left").slice(0, -2) - 0) + $(obj).find("ul li:last").width();
 					$(obj).find("ul").append('<li class="banana4_li_' + _serial + '">' + _list[getCount(i)] + '</li>');
 					setListCSS(obj, left);
-					dragevent(obj, $(obj).find('.banana4_li_' + _serial));
+					//dragevent(obj, $(obj).find('.banana4_li_' + _serial));
 					_serial++;
 				}
 			}else if(d=="prev") {
@@ -369,7 +417,7 @@
 					left = ($(obj).find("ul li:first").css("left").slice(0, -2) - 0);
 					$(obj).find("ul").prepend('<li class="banana4_li_' + _serial + '">' + _list[getCount(i)] + '</li>');
 					setListCSS(obj, left);
-					dragevent(obj, $(obj).find('.banana4_li_' + _serial));
+					//dragevent(obj, $(obj).find('.banana4_li_' + _serial));
 					_serial++;
 				}
 			}
@@ -386,7 +434,8 @@
 		}
 
 		function setListCSS(obj, left) {
-			$(obj).find("li.banana4_li_" + _serial).css(cssList());
+			//$(obj).find("li.banana4_li_" + _serial).css(cssList());
+			cssList($(obj).find("li.banana4_li_" + _serial));
 			$(obj).find("li.banana4_li_" + _serial).css({
 				left : left + "px"
 			});
@@ -400,17 +449,25 @@
 		--------------------- */
 
 		function css(obj) {
+			var css_position = ($(obj).css("position") && $(obj).css("position")!="static") ? $(obj).css("position") : "relative";
+
+			var strlen = _args.outer_width.length;
+			var outer_w;
+			if(_args.outer_width.substr(-2, 2)=="px") {
+				var outer_width = _args.outer_width.substr(0, strlen-2);
+				outer_w = (_args.responsive && $(window).width() < outer_width) ? "100%" : _args.outer_width;
+			}else {
+				outer_w = _args.outer_width;
+			}
+
 			$(obj).css({
-				width : _args.outer_width,
-				height : _args.outer_height
-			});
-			$(obj).css({
-				width : _args.outer_width,
+				width : outer_w,
 				height : _args.outer_height,
 				overflow : "hidden",
-				position : "relative"
+				position : css_position
 			});
-			$(obj).find("ul li").css(cssList());
+			//$(obj).find("ul li").css(cssList());
+			cssList($(obj).find("ul li"));
 			$(obj).find("ul li").each(function(i) {
 				$(this).css({
 					left : setListPosition(obj, "next", i) + "px"
@@ -418,16 +475,57 @@
 			});
 		}
 
+		function cssList(obj) {
+
+			var strlen = _args.inner_width.length;
+			var inner_w;
+			var responsive = false;
+			if(_args.inner_width.substr(-2, 2)=="px") {
+				var inner_width = _args.inner_width.substr(0, strlen-2);
+				inner_w = (_args.responsive && $(window).width() < inner_width) ? "100%" : _args.inner_width;
+				responsive = true;
+			}else {
+				inner_w = _args.inner_width;
+				responsive = false;
+			}
+
+			obj.css({
+				display : "block",
+				width : inner_w,
+				height : _args.inner_height,
+				textAlign : "center",
+				position : "absolute",
+				top : 0
+			});
+
+			obj.find("img").css({
+				width : inner_w
+			})
+
+		}
+
+		/*
 		function cssList() {
+
+			var strlen = _args.inner_width.length;
+			var inner_w;
+			if(_args.inner_width.substr(-2, 2)=="px") {
+				var inner_width = _args.inner_width.substr(0, strlen-2);
+				inner_w = (_args.responsive && $(window).width() < inner_width) ? "100%" : _args.inner_width;
+			}else {
+				inner_w = _args.inner_width;
+			}
+
 			return {
 				display : "block",
-				width : _args.inner_width,
+				width : inner_w,
 				height : _args.inner_height,
 				textAlign : "center",
 				position : "absolute",
 				top : 0
 			};
 		}
+		*/
 
 
 
@@ -473,6 +571,7 @@
 				if(!_args.delay) _args.delay = 5000;
 			}
 			if(_args.auto != false) _args.auto = true;
+			if(_args.responsive != false) _args.responsive = true;
 		}
 
 		function initList(obj) {
@@ -494,5 +593,8 @@
 				next : getCount(2)
 			};
 		}
+
+		return this.each(INIT);
+
 	}
 })(jQuery);
