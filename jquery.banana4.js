@@ -120,6 +120,11 @@
 			removeDragevent(r);
 		}
 
+		$.banana4.resize = function(r) {
+			var obj = r;
+			RESIZE(r);
+		}
+
 
 		/* --------------------
 
